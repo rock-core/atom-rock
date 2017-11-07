@@ -15,6 +15,7 @@
     "atom-package-deps": "^4.0.1"
   },
   "package-deps": [
-    "language-ruby"
+    "language-ruby",
+    "build-autoproj"
   ]
 }
