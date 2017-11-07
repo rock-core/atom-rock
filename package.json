@@ -1,0 +1,20 @@
+{
+  "name": "rock",
+  "main": "./lib/rock",
+  "version": "0.0.0",
+  "description": "General setup to use Atom on a Rock system",
+  "keywords": [
+      "rock"
+  ],
+  "repository": "https://github.com/rock-core/atom-rock",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+      "atom-package-deps": "^4.0.1"
+  },
+  "package-deps": [
+      "language-ruby"
+  ]
+}
