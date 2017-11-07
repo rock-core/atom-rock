@@ -16,6 +16,7 @@
   },
   "package-deps": [
     "language-ruby",
-    "build-autoproj"
+    "build-autoproj",
+    "linter"
   ]
 }
