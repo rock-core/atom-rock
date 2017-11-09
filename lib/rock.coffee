@@ -18,24 +18,23 @@ module.exports =
       @_tryToSetGrammar editor
 
     @_projectPaths = atom.project.getPaths();
-    @refreshSyskitTargets(workspacePath) for workspacePath in @_projectPaths
+    @refreshSyskitTargets(bundlePath) for bundlePath in @_projectPaths
     atom.project.onDidChangePaths (newProjectPaths) =>
-      addedPaths   = newProjectPaths.filter el ->
-          projectPaths.indexOf(el) == -1
-      removedPaths = projectPaths.filter el ->
+      addedPaths   = newProjectPaths.filter (el) =>
+          @_projectPaths.indexOf(el) == -1
+      removedPaths = @_projectPaths.filter (el) ->
           newProjectPaths.indexOf(el) == -1
       @_projectPaths = newProjectPaths;
-      @refreshSyskitTargets(workspacePath) for workspacePath in addedPaths
+      @refreshSyskitTargets(bundlePath) for bundlePath in addedPaths
 
-  refreshSyskitTargets: (workspacePath) ->
-      glob.sync(path.join(workspacePath, 'bundles', '*')).map (bundlePath) =>
-          @discoverBundle(bundlePath).map (robotConfig) =>
-              @defineAtomCommand(workspacePath, robotConfig)
+  refreshSyskitTargets: (bundlePath) ->
+      @discoverBundle(bundlePath).map (robotConfig) =>
+          @defineAtomCommand(bundlePath, robotConfig)
 
-  defineAtomCommand: (workspacePath, config) ->
+  defineAtomCommand: (bundlePath, config) ->
       commandName = "syskit:start-IDE-#{config.bundleName}-#{config.robotName}"
       atom.commands.add 'atom-workspace', commandName, ->
-          envsh = '"' + path.join(workspacePath, 'env.sh') + '"'
+          envsh = '"' + path.join(bundlePath, '..', '..', 'env.sh') + '"'
           child_process.spawn "bash -c '. #{envsh}; ruby -S syskit ide -r#{config.robotName}'", stdio: 'ignore', detached: false, shell: true, cwd: config.bundlePath
       commandName
 
