@@ -5,38 +5,57 @@ path = require 'path';
 fs   = require 'fs';
 glob = require 'glob';
 child_process = require 'child_process';
+{ CompositeDisposable } = require 'atom';
 
 module.exports =
-  _off: []
+  _disposables: new CompositeDisposable();
   _projectPaths: []
+  _projectCommands: new Map()
 
   activate: (state) ->
-    require('atom-package-deps').install('rock')
-    @_off.push atom.workspace.observeTextEditors (editor) =>
-      @_off.push editor.onDidChangePath =>
-        @_tryToSetGrammar editor
-      @_tryToSetGrammar editor
+      require('atom-package-deps').install('rock')
+      @_disposables.add atom.workspace.observeTextEditors (editor) =>
+          @_disposables.add editor.onDidChangePath =>
+              @tryToSetGrammar editor
+          @tryToSetGrammar editor
 
-    @_projectPaths = atom.project.getPaths();
-    @refreshSyskitTargets(bundlePath) for bundlePath in @_projectPaths
-    atom.project.onDidChangePaths (newProjectPaths) =>
+      @refreshProjectPaths(atom.project.getPaths())
+      @_disposables.add atom.project.onDidChangePaths (newProjectPaths) =>
+          @refreshProjectPaths(newProjectPaths)
+
+  deactivate: ->
+      @_disposables.dispose()
+
+  refreshProjectPaths: (newProjectPaths) ->
       addedPaths   = newProjectPaths.filter (el) =>
           @_projectPaths.indexOf(el) == -1
       removedPaths = @_projectPaths.filter (el) ->
           newProjectPaths.indexOf(el) == -1
       @_projectPaths = newProjectPaths;
-      @refreshSyskitTargets(bundlePath) for bundlePath in addedPaths
+      removedPaths.forEach (bundlePath) =>
+          @_projectCommands.get(bundlePath).dispose()
+          @_projectCommands.delete(bundlePath)
+      addedPaths.forEach (bundlePath) =>
+          projectDisposables = new CompositeDisposable()
+          @_projectCommands.set(bundlePath, projectDisposables)
+          @refreshSyskitTargets(bundlePath, projectDisposables)
 
-  refreshSyskitTargets: (bundlePath) ->
-      @discoverBundle(bundlePath).map (robotConfig) =>
-          @defineAtomCommand(bundlePath, robotConfig)
+  refreshSyskitTargets: (bundlePath, disposables) ->
+      @discoverBundle(bundlePath).forEach (robotConfig) =>
+          disposables.add(@defineAtomCommand(bundlePath, robotConfig))
 
   defineAtomCommand: (bundlePath, config) ->
       commandName = "syskit:start-IDE-#{config.bundleName}-#{config.robotName}"
+      workspacePath = path.dirname(path.dirname(bundlePath))
+      autoprojExePath = path.join(workspacePath, '.autoproj', 'bin', 'autoproj')
       atom.commands.add 'atom-workspace', commandName, ->
           envsh = '"' + path.join(bundlePath, '..', '..', 'env.sh') + '"'
-          child_process.spawn "bash -c '. #{envsh}; ruby -S syskit ide -r#{config.robotName}'", stdio: 'ignore', detached: false, shell: true, cwd: config.bundlePath
-      commandName
+          run_ide = child_process.spawn autoprojExePath, ['exec', 'syskit', 'ide', "-r#{config.robotName}"],
+              { cwd: config.bundlePath }
+
+          run_ide.on 'close', (code) ->
+              if code != 0
+                  atom.notifications.addError("Autoproj: Failed to start the Syskit IDE: #{run_ide.stderr}")
 
   discoverBundle: (bundlePath) ->
       robots     = glob.sync(path.join(bundlePath, 'config', 'robots', '*.rb'))
@@ -44,23 +63,17 @@ module.exports =
       robots.map (robotConfigPath) ->
           { bundlePath: bundlePath, bundleName: bundleName, robotName: path.basename(robotConfigPath, '.rb') }
 
-  deactivate: ->
-    o?() for o in @_off
-    @_onceAllPackagesActivated.dispose()
-    @_onceAllPackagesActivated = null
 
-  _tryToSetGrammar: (editor) ->
-    fullPath = editor.getPath()
-    return unless fullPath?
-    filename = path.basename fullPath
-    if filename.match(/\.orogen$/)
-        scopeName = 'source.ruby';
-    else if filename.match(/\.osdeps$/)
-        scopeName = 'source.yaml';
-    else if filename == 'manifest' && path.basename(path.dirname(fullPath)) == 'autoproj'
-        scopeName = 'source.yaml';
+  tryToSetGrammar: (editor) ->
+      fullPath = editor.getPath()
+      return unless fullPath?
+      filename = path.basename fullPath
+      if filename.match(/\.orogen$/)
+          scopeName = 'source.ruby';
+      else if filename.match(/\.osdeps$/)
+          scopeName = 'source.yaml';
+      else if filename == 'manifest' && path.basename(path.dirname(fullPath)) == 'autoproj'
+          scopeName = 'source.yaml';
 
-    if scopeName?
-        g = atom.grammars.grammarForScopeName scopeName
-        if g?
-            editor.setGrammar g
+      if scopeName?
+          atom.grammars.grammarForScopeName(scopeName)?.setGrammar(g)
