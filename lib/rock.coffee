@@ -22,6 +22,9 @@ module.exports =
           atom.config.set 'editor.atomicSoftTabs', false
           atom.config.set 'editor.tabLength', 4
           atom.config.set 'tree-view.hideIgnoredNames', true
+          atom.config.set "linter-ui-default.decorateOnTreeView", "Files and Directories"
+          atom.config.set "linter-ui-default.panelRepresents", "Entire Project"
+          atom.config.set "linter-ui-default.showPanel", true
 
       @_disposables.add atom.workspace.observeTextEditors (editor) =>
           @_disposables.add editor.onDidChangePath =>
