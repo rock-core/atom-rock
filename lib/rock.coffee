@@ -13,9 +13,9 @@ module.exports =
   _projectCommands: new Map()
 
   activate: (state) ->
-      @_disposables.add atom.commands.add 'rock:install-default-packages', =>
+      @_disposables.add atom.commands.add 'atom-workspace', 'rock:install-default-packages', =>
           require('atom-package-deps').install('rock')
-      @_disposables.add atom.commands.add 'rock:setup-defaults', =>
+      @_disposables.add atom.commands.add 'atom-workspace', 'rock:setup-defaults', =>
           require('atom-package-deps').install('rock')
           atom.config.set 'atom-ide-ui.use.atom-ide-diagnostic-ui', false
           atom.config.set 'build.refreshOnShowTargetList', true
