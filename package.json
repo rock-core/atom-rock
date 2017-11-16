@@ -2,7 +2,7 @@
   "name": "rock",
   "main": "./lib/rock",
   "version": "0.3.0",
-  "description": "General setup to use Atom on a Rock system",
+  "description": "Fine-tuning of an Atom editor to work on a Rock system",
   "keywords": [
     "rock"
   ],
@@ -17,6 +17,7 @@
   },
   "package-deps": [
     "language-ruby",
+    "build",
     "build-autoproj",
     "linter"
   ]

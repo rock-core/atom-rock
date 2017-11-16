@@ -13,7 +13,16 @@ module.exports =
   _projectCommands: new Map()
 
   activate: (state) ->
-      require('atom-package-deps').install('rock')
+      @_disposables.add atom.commands.add 'rock:install-default-packages', =>
+          require('atom-package-deps').install('rock')
+      @_disposables.add atom.commands.add 'rock:setup-defaults', =>
+          require('atom-package-deps').install('rock')
+          atom.config.set 'atom-ide-ui.use.atom-ide-diagnostic-ui', false
+          atom.config.set 'build.refreshOnShowTargetList', true
+          atom.config.set 'editor.atomicSoftTabs', false
+          atom.config.set 'editor.tabLength', 4
+          atom.config.set 'tree-view.hideIgnoredNames', true
+
       @_disposables.add atom.workspace.observeTextEditors (editor) =>
           @_disposables.add editor.onDidChangePath =>
               @tryToSetGrammar editor

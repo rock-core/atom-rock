@@ -11,9 +11,19 @@ manager. Alternatively, you may install it from the command line with:
 apm install rock
 ~~~
 
-## Usage
+## What does it do ?
 
-- uses the ruby language for `.orogen` files as Ruby files
-- uses the YAML scope for the autoproj files that are in YAML
+- it tries to setup the right scopes for rock-specific files that have
+  non-standard extensions. For instance, it sets up the ruby language
+  for `.orogen` files, or YAML for the autoproj files that are in YAML
 - provides the "Start Syskit IDE" action for bundle packages
 
+This package also allows to install other packages that are useful within a
+Rock system, such as the `build-autoproj` package. It provides two commands
+to this effect:
+
+- "Rock Install Defaults" will install packages that are deemed useful in a
+  Rock system.
+- "Rock Setup Defaults" will install packages, but also change Atom's
+  configuration to fit a Rock system better
+  
