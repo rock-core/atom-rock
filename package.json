@@ -19,6 +19,7 @@
     "language-ruby",
     "build",
     "build-autoproj",
-    "linter"
+    "linter",
+    "platformio-ide-terminal"
   ]
 }
