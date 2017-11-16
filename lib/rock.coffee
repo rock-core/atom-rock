@@ -76,4 +76,6 @@ module.exports =
           scopeName = 'source.yaml';
 
       if scopeName?
-          atom.grammars.grammarForScopeName(scopeName)?.setGrammar(g)
+          g = atom.grammars.grammarForScopeName(scopeName)
+          if g?
+              editor.setGrammar(g)
