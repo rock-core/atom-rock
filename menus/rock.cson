@@ -1,0 +1,20 @@
+"menu": [
+    {
+        "label": "Packages",
+        "submenu": [
+            {
+                "label": "Rock",
+                "submenu": [
+                    {
+                        "label": "Install Default Packages",
+                        "command": 'rock:install-default-packages'
+                    },
+                    {
+                        "label": "Apply Default Configuration",
+                        "command": 'rock:apply-default-configuration'
+                    }
+                ]
+            }
+        ]
+    }
+]

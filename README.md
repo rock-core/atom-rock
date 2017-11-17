@@ -20,10 +20,9 @@ apm install rock
 
 This package also allows to install other packages that are useful within a
 Rock system, such as the `build-autoproj` package. It provides two commands
-to this effect:
+to this effect, that can be found in the Packages>Rock menu.
 
-- "Rock Install Defaults" will install packages that are deemed useful in a
+- "Rock Install Default Packages" will install packages that are deemed useful in a
   Rock system.
-- "Rock Setup Defaults" will install packages, but also change Atom's
+- "Rock Apply Default Configuration" will install packages, but also change Atom's
   configuration to fit a Rock system better
-  
