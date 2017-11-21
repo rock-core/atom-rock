@@ -82,6 +82,8 @@ module.exports =
       filename = path.basename fullPath
       if filename.match(/\.orogen$/)
           scopeName = 'source.ruby';
+      else if filename.match(/\.autobuild$/)
+          scopeName = 'source.ruby';
       else if filename.match(/\.osdeps$/)
           scopeName = 'source.yaml';
       else if filename == 'manifest' && path.basename(path.dirname(fullPath)) == 'autoproj'
