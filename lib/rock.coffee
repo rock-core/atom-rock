@@ -26,10 +26,11 @@ module.exports =
           atom.config.set "linter-ui-default.panelRepresents", "Entire Project"
           atom.config.set "linter-ui-default.showPanel", true
 
-      @_disposables.add atom.workspace.observeTextEditors (editor) =>
-          @_disposables.add editor.onDidChangePath =>
+      @_disposables.add atom.packages.onDidActivateInitialPackages =>
+          @_disposables.add atom.workspace.observeTextEditors (editor) =>
+              @_disposables.add editor.onDidChangePath =>
+                  @tryToSetGrammar editor
               @tryToSetGrammar editor
-          @tryToSetGrammar editor
 
       @refreshProjectPaths(atom.project.getPaths())
       @_disposables.add atom.project.onDidChangePaths (newProjectPaths) =>
